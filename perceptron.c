@@ -1,4 +1,13 @@
 #include <stdio.h>
+#define DEBUG 0
+#if DEBUG
+#define LEARNING_LOG(...) printf("Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
+                            printf(__VA_ARGS__); \
+                            printf("\n");
+#else
+#define LEARNING_LOG(...)
+#endif
+
 #define LEARNING_RATE 0.4
 
 float sigmod_function(float x);
@@ -29,7 +38,7 @@ float sigmod_function(float x)
 
 float sum_node(float w1,float w2,float theta, float x1,float x2)
 {
-    printf("w1(%f) * x1(%f) + \n w2(%f) * x2(%f) - \ntheta(%f)\n", w1,x1,w2,x2,theta);
+    LEARNING_LOG("w1(%f) * x1(%f) + \n w2(%f) * x2(%f) - \ntheta(%f)\n", w1,x1,w2,x2,theta);
     return (w1 * x1 + w2 * x2 + ((-1) * theta));
 }
 
@@ -51,9 +60,9 @@ float test_data[4][3] =
 
 int main()
 {
-    float w1 = 0.01;
-    float w2 = 0.02;
-    float theta = 0.03;
+    float w1 = 0.1;
+    float w2 = 0.2;
+    float theta = 0.3;
     float x1 = 0;
     float x2 = 0;
     int i;
@@ -63,21 +72,21 @@ int main()
     for(i = 0;i < 4; i++)
     {
         study(&w1,&w2,&theta, test_data[i][0],test_data[i][1],test_data[i][2],learning_rate);
-        printf("\n\n w1(%f) w2(%f)\n", w1,w2);
+        LEARNING_LOG("\n\n w1(%f) w2(%f)\n", w1,w2);
     }
-    printf("w1(%f) w2(%f)\n", w1,w2);
+    LEARNING_LOG("w1(%f) w2(%f)\n", w1,w2);
     while(1)
     {
         printf("please input 'x1,x2'\n");
         scanf("%f,%f",&x1,&x2);
-        printf("x1 = %f,x2 = %f \n",x1,x2);
+        LEARNING_LOG("x1 = %f,x2 = %f \n",x1,x2);
         if(sigmod_function(sum_node(w1,w2,theta,x1,x2)))
         {
-            printf(" out 1\n"); 
+            printf("out 1\n"); 
         }        
         else 
         {
-            printf(" out 0\n");
+            printf("out 0\n");
         }
     }
     return 0;
