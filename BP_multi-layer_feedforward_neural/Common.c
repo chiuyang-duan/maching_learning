@@ -1,6 +1,4 @@
 #include "Common.h"
-#include <math.h>
-
 
 float act_squashing_function(float x)
 {
