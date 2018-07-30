@@ -51,6 +51,7 @@ void study(float *w1,float *w2,float *theta,float input_x1,float input_x2,float 
     *theta = (-1.0) * out_y + *theta;
 }
 
+/*x1 || x2 laerning_data*/
 float test_data[4][3] = 
 {{1,1,1},
 {1,0,1},
