@@ -2,12 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-/*å­¦ä¹ ç›®æ ‡ 
+/*Ñ§Ï°Ä¿±ê 
 y<x && y>0 && x<5
-è¾“å…¥ 
+ÊäÈë 
 data_x   
 data_y
-ç›®æ ‡åœ¨å‡½æ•°çš„ä¸‰è§’å½¢åŒºåŸŸé‡Œè¾¹
+Ä¿±êÔÚº¯ÊýµÄÈý½ÇÐÎÇøÓòÀï±ß
 data_out1 = 1;
 data_out2 = 0;
 */
@@ -61,7 +61,7 @@ void bp_function(double *input_data)
         {
             hidden_b[i] = hidden_b[i] + input_data[j]* para_v[(i*input_num)+j];            
         } 
-        hidden_b[i] = hidden_b[i] - para_v[(i*input_num)+j];
+        hidden_b[i] = act_squashing_function(hidden_b[i] + (-1.0) * para_v[(i*input_num)+j]);
     }
     
     for(i = 0; i< out_num;i++)
@@ -70,7 +70,7 @@ void bp_function(double *input_data)
         {
             out_data[i] = out_data[i] + hidden_b[j]* para_w[(i*hidden_layer_num)+j];            
         } 
-        out_data[i] = out_data[i] - para_w[(i*hidden_layer_num)+j]; 
+        out_data[i] = act_squashing_function(out_data[i] + (-1.0) * para_w[(i*hidden_layer_num)+j]); 
     }    
     
     free(out_data);
