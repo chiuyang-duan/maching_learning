@@ -2,7 +2,23 @@
 
 ----------
 
-# maching_learning #
+# MACHING_LEARNING #
+## 机器学习_周志华 C语言实现 ##
+### 目录 ###
+
+<dir>
+<li>1 神经网络基础_C语言实现</li>
+<li>&emsp;&emsp;1.1 感知机</li>
+<li>&emsp;&emsp;1.2 单隐层前馈神经网络 </li>
+
+</dir>
+<br>
+<br><br><br><br><br><br>
+
+
+----------
+
+
 **maching_learning** copyright by qiuyang.duan  
 **email** 631735354@qq.com
 
@@ -13,20 +29,6 @@
 </small></i> 
 
 ----------
-
-## 机器学习-周志华 C语言实现 ##
-### 目录 ###
-
-<dir>
-<li>1 神经网络基础_C语言实现</li>
-<li>&emsp;&emsp;1.1 感知机</li>
-<li>&emsp;&emsp;1.2 单隐层前馈神经网络 </li>
-
-</dir>
-<br>
-<br><br><br><br><br><br><br><br><br>
-
-
 
 
 
