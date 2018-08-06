@@ -51,6 +51,8 @@ void init_data(struct input_data * datain, struct output_data * dataout)
     datain->hidden_layer_num = HIDDEN_LAYER_NUM;//4;
 
     datain->x = (double *)malloc((datain->input_num) * sizeof(double))
+    datain->y = (double *)malloc((datain->out_num) * sizeof(double))
+    memset(datain->y,0,(datain->out_num) * sizeof(double));
     memset(datain->x,0,(datain->input_num) * sizeof(double));
 
     dataout->hidden_b = (double *)malloc(datain->hidden_layer_num * sizeof(double));         
@@ -65,15 +67,6 @@ void init_data(struct input_data * datain, struct output_data * dataout)
     
 }
 
-struct delta_parameters{
-
-    double * w;
-    double * theta;
-    
-    double * v;
-    double * gama;
-    
-};
 void init_delta_para(struct input_data * datain, struct delta_parameters * delta_para)
 {
     delta_para = (delta_parameters *)malloc(sizeof(delta_parameters));
@@ -136,29 +129,30 @@ void bp_function(struct input_data * datain, struct output_data * dataout)
 void para_iteration(struct input_data * datain, struct output_data * dataout, struct delta_parameters * delta_para)
 {
     int i,j;
-
+	double gradient;
+	
+    for(i = 0; i< datain->out_num;i++)
+    {
+    	gradient = dataout->y[i] * (1 - dataout->y[i]) * (datain->y[i] - dataout->y[i]);
+        for(j = 0;j < datain->hidden_layer_num;j++)
+        {
+            delta_para->w[(i * datain->hidden_layer_num)+j] = 
+				LEARNING_RATE1 * gradient * dataout->hidden_b[j];
+            
+        } 
+    }   
+	
     for(i = 0; i< datain->hidden_layer_num;i++)
     {
         for(j = 0;j < datain->input_num;j++)
         {
-            dataout->para_v[(i * datain->input_num)+j];      
+            delta_para->v[(i * datain->input_num)+j] =        
 
             
 
             
         } 
     }
-    for(i = 0; i< datain->out_num;i++)
-    {
-        for(j = 0;j < datain->hidden_layer_num;j++)
-        {
-            dataout->para_w[(i * datain->hidden_layer_num)+j];   
-
-
-
-            
-        } 
-    }   
 
 }
 
@@ -175,9 +169,10 @@ int main()
     
     for(j = 0; j < 1500; j++)
     {
-        for(i = 0; i < max; i++)
+        for(i = 0; i < 2; i++)
         {
-            datain->x[i] = data_x[i][j];         
+            datain->x[i] = data_x[i][j];  
+			datain->y[]
         }         
         bp_function(datain, dataout);
         para_iteration(datain, dataout, delta_para);
