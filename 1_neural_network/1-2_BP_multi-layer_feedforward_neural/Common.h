@@ -3,21 +3,29 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <time.h>
 
-struct study_data{
-int input_node_num;
-int output_node_num;
-float * input_data;
-float * output_data;
+#define INPUT_NUM 2
+#define OUT_NUM 2
+#define HIDDEN_LAYER_NUM 4
+
+struct input_data{
+    double * x;
+    int input_num; //none dummy node
+    int out_num;   //none dummy node
+    int hidden_layer_num;  //none dummy node
 };
-struct input_floor{
-int node_num;
-float * input_data;
-
+struct output_data{
+    double * para_w;
+    double * para_v;
+    double * hidden_b;
+    double * y;
 };
 
 float act_squashing_function(float x);
 float act_step_function(float x);
+void normal_zscore(double * inputdata, int length, double * outdata);
 
  
 #endif
