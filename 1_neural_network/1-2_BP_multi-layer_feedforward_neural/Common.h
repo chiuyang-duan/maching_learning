@@ -9,8 +9,10 @@
 #define INPUT_NUM 2
 #define OUT_NUM 2
 #define HIDDEN_LAYER_NUM 4
+#define LEARNING_RATE1 0.2
 
 struct delta_parameters{
+    double * gradient;
 
     double * w;
     double * theta;
