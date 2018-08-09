@@ -39,10 +39,3 @@ void normal_zscore(double * inputdata, int length, double * outdata)
 }
 
 
-
-
-
-
-
-
-

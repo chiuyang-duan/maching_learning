@@ -11,7 +11,9 @@
 
 #define INPUT_NUM 2
 #define OUT_NUM 2
-#define HIDDEN_LAYER_NUM 4
+#define HIDDEN_LAYER_NUM 3
+#define TEST_NUM 3000
+#define CODE_VERSION "1.2 20180809"
 
 struct delta_parameters{
     double * gradient;
@@ -38,7 +40,11 @@ struct output_data{
     double * hidden_b;
     double * y;
 };
-
+struct pdata{
+    struct input_data       * pin;
+    struct output_data      * pout;
+    struct delta_parameters * pdelta;
+};
 
 double act_squashing_function(double x);
 double act_step_function(double x);
