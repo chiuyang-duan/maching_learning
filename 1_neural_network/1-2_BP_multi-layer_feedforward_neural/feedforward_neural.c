@@ -256,7 +256,9 @@ void bp_function(struct input_data * datain, struct output_data * dataout)
     int i,j;
    
     LEARNING_LOG("bp_function\n");
-
+    
+    memset(dataout->hidden_b,0,datain->hidden_layer_num * sizeof(double));
+    
     for(i = 0; i< datain->hidden_layer_num;i++)
     {
         for(j = 0;j < datain->input_num;j++)
@@ -265,6 +267,9 @@ void bp_function(struct input_data * datain, struct output_data * dataout)
         } 
         dataout->hidden_b[i] = act_squashing_function(dataout->hidden_b[i] + (-1.0) * dataout->para_v[(i * datain->input_num)+j]);
     }
+
+    memset(dataout->y,0,(datain->out_num) * sizeof(double));
+    
     for(i = 0; i< datain->out_num;i++)
     {
         for(j = 0;j < datain->hidden_layer_num;j++)
@@ -344,18 +349,16 @@ int main()
     pdata1 = init_delta_para(datain,delta_para);
     delta_para = pdata1.pdelta;
     
-    make_study_data2();
+    make_study_data1();
 	
 	printf("pls input learning rate\n");
 	scanf("%lf",&learning_rate);
 	
-    for(j = 0; j < TEST_NUM; j++)
-    {
-        for(i = 0; i < 2; i++)
-        {
-            datain->x[i] = data_x[i][j];  
-			datain->y[i] = data_out[i][j];
-        }         
+    for(j = 0; j < TEST_NUM; j++){
+        for(i = 0; i < INPUT_NUM; i++)
+            datain->x[i] = data_x[i][j]; 			
+        for(i = 0; i < OUT_NUM; i++)
+            datain->y[i] = data_out[i][j]; 			
         bp_function(datain, dataout);
         para_iteration(datain, dataout, delta_para, learning_rate);
     }
@@ -371,7 +374,7 @@ int main()
         datain->x[0] = input_x[0];
         datain->x[1] = input_x[1];
         bp_function(datain, dataout);
-        study_data2_result();
+        study_data1_result();
         
         printf("positive is higher negative is lower \n");
         printf("x = %lf,y = %lf\n",input_x[0],input_x[1]);
