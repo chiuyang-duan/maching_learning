@@ -11,8 +11,10 @@
 
 #define INPUT_NUM 2
 #define OUT_NUM 2
-#define HIDDEN_LAYER_NUM 3
-#define TEST_NUM 3000
+
+#define HIDDEN_LAYER_NUM 30
+
+#define TEST_NUM 10000
 #define CODE_VERSION "1.2 20180809"
 
 struct delta_parameters{
