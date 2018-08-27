@@ -37,6 +37,8 @@ double rand_num(double max)
 	rand1 = (((double)(rand()%1000)/1000.0 * (2 * max)) - max);
     return rand1;
 }
+
+
 void study_data1_result()
 {
     printf("                             \n");
@@ -174,7 +176,7 @@ struct pdata init_data(struct input_data * datain, struct output_data * dataout)
         {
             dataout->para_v[(i * (datain->input_num + 1)) + j] = rand_num(1);            
         } 
-        dataout->para_v[(i * datain->input_num) + j] = rand_num(1);
+        dataout->para_v[(i * (datain->input_num + 1)) + datain->input_num] = rand_num(1);
     }
     for(i = 0; i< datain->out_num; i++)
     {
@@ -182,7 +184,7 @@ struct pdata init_data(struct input_data * datain, struct output_data * dataout)
         {
             dataout->para_w[(i * (datain->hidden_layer_num + 1)) + j] = rand_num(1);            
         } 
-        dataout->para_w[(i * datain->hidden_layer_num) + j] = rand_num(1); 
+        dataout->para_w[(i * (datain->hidden_layer_num + 1)) + datain->hidden_layer_num] = rand_num(1); 
     }   
     
     pdata1.pin = datain;
@@ -265,7 +267,7 @@ void bp_function(struct input_data * datain, struct output_data * dataout)
         {
             dataout->hidden_b[i] = dataout->hidden_b[i] + datain->x[j] * dataout->para_v[(i * (datain->input_num + 1))+j];            
         } 
-        dataout->hidden_b[i] = act_squashing_function(dataout->hidden_b[i] + (-1.0) * dataout->para_v[(i * datain->input_num)+j]);
+        dataout->hidden_b[i] = act_squashing_function(dataout->hidden_b[i] + (-1.0) * dataout->para_v[((i * (datain->input_num + 1))+datain->input_num)]);
     }
 
     memset(dataout->y,0,(datain->out_num) * sizeof(double));
@@ -276,7 +278,7 @@ void bp_function(struct input_data * datain, struct output_data * dataout)
         {
             dataout->y[i] = dataout->y[i] + dataout->hidden_b[j] * dataout->para_w[(i * (datain->hidden_layer_num + 1))+j];            
         } 
-        dataout->y[i] = act_squashing_function(dataout->y[i] + (-1.0) * dataout->para_w[(i * datain->hidden_layer_num)+j]); 
+        dataout->y[i] = act_squashing_function(dataout->y[i] + (-1.0) * dataout->para_w[((i * (datain->hidden_layer_num + 1))+datain->hidden_layer_num)]); 
     }    
     
 }
@@ -284,7 +286,7 @@ void para_iteration(struct input_data * datain, struct output_data * dataout, st
 {
     int i,j,k;
     double sum_w_g = 0;
-	double eh = 0;
+    double eh = 0;
     for(i = 0; i < datain->out_num;i++)
     {
     	delta_para->gradient[i] = dataout->y[i] * (1 - dataout->y[i]) * (datain->y[i] - dataout->y[i]);
@@ -316,7 +318,7 @@ void para_iteration(struct input_data * datain, struct output_data * dataout, st
         {
              dataout->para_v[(i * (datain->input_num + 1)) + j] = dataout->para_v[(i * (datain->input_num + 1)) + j] + delta_para->v[(i * datain->input_num) + j];            
         } 
-        dataout->para_v[(i * datain->input_num) + j] = dataout->para_v[(i * datain->input_num) + j] + delta_para->gama[i];
+        dataout->para_v[(i * (datain->input_num + 1)) + datain->input_num] = dataout->para_v[(i * (datain->input_num + 1)) + datain->input_num] + delta_para->gama[i];
     }
     for(i = 0; i< datain->out_num;i++)
     {
@@ -324,20 +326,36 @@ void para_iteration(struct input_data * datain, struct output_data * dataout, st
         {
             dataout->para_w[(i * (datain->hidden_layer_num + 1)) + j] = dataout->para_w[(i * (datain->hidden_layer_num + 1)) + j] + delta_para->w[(i * datain->hidden_layer_num) +j];            
         } 
-        dataout->para_w[(i * datain->hidden_layer_num)+j] = dataout->para_w[(i * datain->hidden_layer_num)+j] + delta_para->theta[i]; 
+        dataout->para_w[(i * (datain->hidden_layer_num + 1)) + datain->hidden_layer_num] = dataout->para_w[(i * (datain->hidden_layer_num + 1)) + datain->hidden_layer_num] + delta_para->theta[i]; 
     }    
 }
-
+void predictive_print(struct input_data * datain, struct output_data * dataout)
+{
+    int i,j;
+    
+    for(i = 20;i > 0; i--)
+    {
+        for(j=0;j < 20;j++)
+        {
+            datain->x[0] = j-10;
+            datain->x[1] = i-10; 
+            bp_function(datain, dataout);
+            printf("%.2lf ",dataout->y[0]);
+        }
+        printf("\n");
+    }
+}
 int main()
 {
-	int i,j;
+    int i,j;
+
 	
-	double input_x[2];
+    double input_x[2];
     struct pdata pdata1;
     struct input_data * datain = NULL;
     struct output_data * dataout = NULL;
     struct delta_parameters * delta_para = NULL;
-	double learning_rate = 0;
+    double learning_rate = 0;
     
     LEARNING_LOG("version : %s \n",CODE_VERSION);
     
@@ -348,11 +366,13 @@ int main()
       
     pdata1 = init_delta_para(datain,delta_para);
     delta_para = pdata1.pdelta;
-    
+#if STUDY1    
     make_study_data1();
-	
-	printf("pls input learning rate\n");
-	scanf("%lf",&learning_rate);
+#else
+    make_study_data2();
+#endif
+    printf("pls input learning rate\n");
+    scanf("%lf",&learning_rate);
 	
     for(j = 0; j < TEST_NUM; j++){
         for(i = 0; i < INPUT_NUM; i++)
@@ -363,7 +383,8 @@ int main()
         para_iteration(datain, dataout, delta_para, learning_rate);
     }
     
-	printf("learning success\n");
+    printf("learning success\n");
+    predictive_print(datain,dataout);
 
     while(1)
     {
@@ -374,8 +395,11 @@ int main()
         datain->x[0] = input_x[0];
         datain->x[1] = input_x[1];
         bp_function(datain, dataout);
+#if STUDY1    
         study_data1_result();
-        
+#else        
+        study_data2_result();
+#endif
         printf("positive is higher negative is lower \n");
         printf("x = %lf,y = %lf\n",input_x[0],input_x[1]);
         printf("in area: [%lf] not in: [%lf]\n",dataout->y[0],dataout->y[1]);

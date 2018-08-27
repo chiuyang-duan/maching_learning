@@ -9,12 +9,14 @@
 #include <memory.h>
 #include <string.h>
 
+#define STUDY1 1
+
 #define INPUT_NUM 2
 #define OUT_NUM 2
 
-#define HIDDEN_LAYER_NUM 30
+#define HIDDEN_LAYER_NUM 4
 
-#define TEST_NUM 10000
+#define TEST_NUM 30000
 #define CODE_VERSION "1.2 20180809"
 
 struct delta_parameters{
