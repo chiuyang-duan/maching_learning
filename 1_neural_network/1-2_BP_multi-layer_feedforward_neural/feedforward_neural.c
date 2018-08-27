@@ -341,8 +341,19 @@ void predictive_print(struct input_data * datain, struct output_data * dataout)
             datain->x[1] = i-10; 
             bp_function(datain, dataout);
             printf("%.2lf ",dataout->y[0]);
+            if((9 == j) && (20 == i))
+                printf("| ");
+            if((9 == j) && (20 != i))
+            {
+                printf("%1.lf ",datain->x[1]);
+            }
         }
         printf("\n");
+        if(11 == i)
+        {
+            printf("------9----8----7----6----5----4----3----2---1-----");
+            printf("--0----1----2----3----4----5----6----7----8----9---\n");
+        }
     }
 }
 int main()
