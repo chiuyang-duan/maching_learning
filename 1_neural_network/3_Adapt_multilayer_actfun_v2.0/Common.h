@@ -9,13 +9,37 @@
 #include <memory.h>
 #include <string.h>
 
-struct neural_arch{
-    int input_node_num;
-    int output_node_num;
-    int hidden_layer_num;
-    int * hidden_layer_node_num;
-    void (*get_arg)(struct * neural_arch);
-    
+#define INPUT_LAYER 0
+#define HIDDEN_ONE_LAYER 1;
+
+struct neural_node 
+{
+    double *weight;
+    double *delta_weight;
+    double out;   
+    struct neural_node * next_node;
+};
+
+struct neural_layer
+{
+    struct neural_node * node; 
+    struct neural_layer * next_layer;
+};
+
+struct neural_arg{
+    int input_node;
+    int output_node;
+    int hidden_layer;
+    int * node_array;
+};
+struct neural_context
+{
+    struct neural_arg * arg;
+    struct neural_layer * layer;
+    int (*init)(struct neural_arg * ,struct neural_layer *);
+    int (*run)(struct neural_arg * ,struct neural_layer *);   
+    int (*get_delta)(struct neural_arg *);
+    int (*para_iteration)(struct neural_arg *);
 };
 
 #endif
