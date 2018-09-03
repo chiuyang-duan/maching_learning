@@ -16,6 +16,8 @@
 
 #endif
 
+struct neural_context * ne = NULL;
+
 struct neural_arg * get_arch_arg(void)
 {
     int i;
@@ -55,11 +57,11 @@ struct neural_arg * get_arch_arg(void)
     return obj;
 }
 
-struct neural_node * get_node(struct neural_arg * arg,int num_current_layer)
+struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_layer)
 {
-//    int OUTPUT_LAYER = arg->hidden_layer + 1;
     int i;
     int NUM_ALL_LAYER = arg->hidden_layer + 2;  
+    struct neural_node * head = NULL;
     
     struct neural_node * obj = kzalloc(sizeof(*obj),GFP_USER);
     LEARN_LOG("layers_context_alloc+++\n");
@@ -67,66 +69,137 @@ struct neural_node * get_node(struct neural_arg * arg,int num_current_layer)
         LEARN_ERR("alloc layers context error! \n");
         return NULL;
     }  
-
+    obj->delta_weight = NULL;
+    obj->out = 0;
+    obj->weight = NULL;
+    obj->next_node = NULL;
+    head = obj;
     
-    if(INPUT_LAYER == num_current_layer){    
-        obj->weight = NULL;
-        obj->delta_weight = NULL;
+    
+    for(i = 0; i < arg->node_array[num_current_layer]; i++)
+    {
+        obj->next_node = kzalloc(sizeof(*obj),GFP_USER);
+        if(!obj->next_node){
+            LEARN_ERR("alloc layers context error! \n");
+            return NULL;
+        }
+        obj = obj->next_node;
+        obj->next_node = NULL;
+        
+        if(INPUT_LAYER == num_current_layer){    
+            obj->weight = NULL;
+            obj->delta_weight = NULL;
+        }
+        else{
+            obj->weight = kzalloc(arg->node_array[num_current_layer-1] * sizeof(double),GFP_USER);
+            if(!obj->weight){
+                LEARN_ERR(" alloc weight error ! \n");
+                return NULL;
+            }          
+            obj->delta_weight = kzalloc(arg->node_array[num_current_layer-1] * sizeof(double),GFP_USER);
+            if(!obj->delta_weight){
+                LEARN_ERR(" alloc delta weight error ! \n");
+                return NULL;
+            }
+        }
     }
-    else if(HIDDEN_ONE_LAYER == num_current_layer){
-        obj->weight = kzalloc(arg->input_node * sizeof(double),GFP_USER);
-        if(!obj->weight){
-            LEARN_ERR(" alloc weight error ! \n");
-            return NULL;
-        }  
-        obj->delta_weight = kzalloc(arg->input_node * sizeof(double),GFP_USER); 
-        if(!obj->delta_weight){
-            LEARN_ERR(" alloc delta weight error ! \n");
-            return NULL;
-        }          
-    }
-    else{
-        obj->weight = kzalloc(arg->node_array[num_current_layer-1] * sizeof(double),GFP_USER);
-        if(!obj->weight){
-            LEARN_ERR(" alloc weight error ! \n");
-            return NULL;
-        }          
-        obj->delta_weight = kzalloc(arg->node_array[num_current_layer-1] * sizeof(double),GFP_USER);
-        if(!obj->delta_weight){
-            LEARN_ERR(" alloc delta weight error ! \n");
-            return NULL;
-        }        
-    }
-
-    
-
-    
-    
-    return obj;
+    return head;
 }
 
 
 struct neural_layer * layers_context_alloc(struct neural_arg * arg)
 {
     int i;
-    struct neural_layer * obj = NULL;
+    struct neural_layer * head = NULL; 
     int NUM_ALL_LAYER = arg->hidden_layer + 2; 
+    struct neural_layer * obj = kzalloc(sizeof(*obj),GFP_USER);
+    LEARN_LOG("layers_context_alloc+++\n");
+    if(!obj){
+        LEARN_ERR("alloc layers context error! \n");
+        return NULL;
+    }
+    obj->next_layer = NULL;
+    obj->node = NULL;
+    head = obj;    
+
     for(i = 0; i < NUM_ALL_LAYER; i++)
     {
-        obj = kzalloc(sizeof(*obj),GFP_USER);
+        obj->next_layer = kzalloc(sizeof(*obj),GFP_USER);
         LEARN_LOG("layers_context_alloc+++\n");
         if(!obj){
             LEARN_ERR("alloc layers context error! \n");
             return NULL;
         }  
+        obj = obj->next_layer;
         obj->next_layer = NULL;
-        obj->node = get_node(arg,i);
+        obj->node = node_context_alloc(arg,i);
     }
     
-    return obj;
+    return head;
 }
 
-struct neural_context * ne = NULL;
+void rand_init()
+{
+    LEARNING_LOG("rand_init\n");
+    srand((int)time(0)); 
+}
+double rand_num(double max)
+{
+	double rand1;
+    LEARNING_LOG("rand_num\n");
+	rand1 = (((double)(rand()%1000)/1000.0 * (2 * max)) - max);
+    return rand1;
+}
+
+int init_neural(struct neural_context * neural)
+{
+    int i,j;
+    struct neural_layer * obj = neural->layer;
+    struct neural_arg * arg = neural->arg;
+    int NUM_ALL_LAYER = arg->hidden_layer + 2;
+    rand_init();    
+    
+    for(i = ;i < NUM_ALL_LAYER;i++)
+    {
+        obj = obj->next_layer;
+        if(0 == i)
+            continue;
+        for(j = 0;j < arg->node_array[(i-1)];j++)
+        {
+            obj->node->weight[j] = rand_num(1);
+            obj->node->delta_weight[j] = 0;
+        }
+        obj->node->out = 0;
+    }
+    return 1;
+}
+
+int neural_run(struct neural_context * neural,struct neural_node *  input_data)
+{
+    int i,j;
+    struct neural_layer * obj = neural->layer;
+    struct neural_layer * layer_head = neural->layer;
+    struct neural_arg * arg = neural->arg;
+    int NUM_ALL_LAYER = arg->hidden_layer + 2;
+    rand_init();    
+    
+    for(i = ;i < NUM_ALL_LAYER;i++){
+        obj = obj->next_layer;        
+        for(j = 0;j < arg->node_array[(i-1)];j++){
+            if(0 == i){
+                input_data = input_data->next_node;
+                obj->node = obj->node->next_node;
+                obj->node->out = input_data->out;
+            }
+            else{
+                obj->node->out = 
+                
+            }
+        }        
+    }
+    return 1;
+}
+
 struct neural_context * neural_context_alloc(void)
 {
     struct neural_context * obj = kzalloc(sizeof(*obj),GFP_USER);
@@ -137,6 +210,12 @@ struct neural_context * neural_context_alloc(void)
     }
     obj->arg =  get_arch_arg();
     obj->layer = layers_context_alloc(obj->arg);
+
+    obj->init = init_neural;
+    obj->run = neural_run;
+    obj->get_delta;
+    obj->para_iteration;
+    
     
     return obj;
 }
@@ -144,8 +223,13 @@ struct neural_context * neural_context_alloc(void)
 int main()
 { 
     ne = neural_context_alloc();    
-
+    ne->init(ne);
     
+    ne->run(ne,inputdata);
+    ne->get_delta();
+    ne->para_iteration();
+
+   
 	return 0;
 }
 
