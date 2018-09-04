@@ -73,6 +73,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
     obj->out = 0;
     obj->weight = NULL;
     obj->next_node = NULL;
+    obj->prev_node = NULL;
     head = obj;
     
     
@@ -83,6 +84,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
             LEARN_ERR("alloc layers context error! \n");
             return NULL;
         }
+        obj->next_node->prev_node = obj;
         obj = obj->next_node;
         obj->next_node = NULL;
         
@@ -121,6 +123,7 @@ struct neural_layer * layers_context_alloc(struct neural_arg * arg)
     obj->next_layer = NULL;
     obj->node = NULL;
     head = obj;    
+    obj->prev_layer = NULL;
 
     for(i = 0; i < NUM_ALL_LAYER; i++)
     {
@@ -130,6 +133,7 @@ struct neural_layer * layers_context_alloc(struct neural_arg * arg)
             LEARN_ERR("alloc layers context error! \n");
             return NULL;
         }  
+        obj->next_layer->prev_layer = obj;
         obj = obj->next_layer;
         obj->next_layer = NULL;
         obj->node = node_context_alloc(arg,i);
@@ -153,49 +157,69 @@ double rand_num(double max)
 
 int init_neural(struct neural_context * neural)
 {
-    int i,j;
+    int i,j,k;
     struct neural_layer * obj = neural->layer;
+    struct neural_layer * layer_head = neural->layer;
+    struct neural_node * current_node = NULL;
     struct neural_arg * arg = neural->arg;
     int NUM_ALL_LAYER = arg->hidden_layer + 2;
-    rand_init();    
-    
-    for(i = ;i < NUM_ALL_LAYER;i++)
-    {
-        obj = obj->next_layer;
-        if(0 == i)
-            continue;
-        for(j = 0;j < arg->node_array[(i-1)];j++)
-        {
-            obj->node->weight[j] = rand_num(1);
-            obj->node->delta_weight[j] = 0;
+    int CURRENT_NUM_NODE,PREV_NUM_NODE;
+    rand_init();
+        
+    for(i = 0;i < NUM_ALL_LAYER;i++){
+        obj = obj->next_layer; 
+        current_node = obj->node;
+        CURRENT_NUM_NODE = arg->node_array[i];
+        for(j = 0;j < CURRENT_NUM_NODE;j++){
+            current_node = current_node->next_node;
+            current_node->out = 0;
+            if(0 == i){
+                current_node->out = 0;
+            }
+            else{
+                PREV_NUM_NODE = arg->node_array[i-1];
+                for(k = 0; k < PREV_NUM_NODE;k++){
+                    current_node->weight[k] = rand_num(1);
+                    current_node->delta_weight[k] = 0;
+                }
+            }
         }
-        obj->node->out = 0;
     }
     return 1;
 }
 
 int neural_run(struct neural_context * neural,struct neural_node *  input_data)
 {
-    int i,j;
+    int i,j,k;
     struct neural_layer * obj = neural->layer;
     struct neural_layer * layer_head = neural->layer;
+    struct neural_node * prev_layer_node = NULL;
+    struct neural_node * current_node = NULL;
     struct neural_arg * arg = neural->arg;
     int NUM_ALL_LAYER = arg->hidden_layer + 2;
-    rand_init();    
+    int CURRENT_NUM_NODE,PREV_NUM_NODE;
     
-    for(i = ;i < NUM_ALL_LAYER;i++){
-        obj = obj->next_layer;        
-        for(j = 0;j < arg->node_array[(i-1)];j++){
+    for(i = 0;i < NUM_ALL_LAYER;i++){
+        obj = obj->next_layer; 
+        current_node = obj->node;
+        CURRENT_NUM_NODE = arg->node_array[i];
+        for(j = 0;j < CURRENT_NUM_NODE;j++){
+            current_node = current_node->next_node;
+            current_node->out = 0;
             if(0 == i){
                 input_data = input_data->next_node;
-                obj->node = obj->node->next_node;
-                obj->node->out = input_data->out;
+                current_node->out = input_data->out;
             }
-            else{
-                obj->node->out = 
-                
+            else{                
+                prev_layer_node = obj->prev_layer->node;
+                PREV_NUM_NODE = arg->node_array[i-1];
+                for(k = 0; k < PREV_NUM_NODE;k++)
+                {
+                    obj->node->out += prev_layer_node->out * current_node->weight[k];
+                    prev_layer_node = prev_layer_node->next_node;
+                }
             }
-        }        
+        }
     }
     return 1;
 }
