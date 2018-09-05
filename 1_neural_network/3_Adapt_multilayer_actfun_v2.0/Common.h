@@ -9,8 +9,14 @@
 #include <memory.h>
 #include <string.h>
 
+#define PARTIAL_DERIVATIVES_COEFFICIENT 0.001
 #define INPUT_LAYER 0
 #define HIDDEN_ONE_LAYER 1;
+#define INIT 0
+#define LEARNING 1
+#define FORECAST 2 
+#define ADD_DELTA 3 
+#define GET_DELTA 4
 
 struct neural_node 
 {
@@ -38,10 +44,7 @@ struct neural_context
 {
     struct neural_arg * arg;
     struct neural_layer * layer;
-    int (*init)(struct neural_arg * ,struct neural_layer * );
-    int (*run)(struct neural_arg * ,struct neural_layer *);   
-    int (*get_delta)(struct neural_arg *);
-    int (*para_iteration)(struct neural_arg *);
+    int (*run)(struct neural_arg * ,struct neural_layer *, int status);   
 };
 
 #endif

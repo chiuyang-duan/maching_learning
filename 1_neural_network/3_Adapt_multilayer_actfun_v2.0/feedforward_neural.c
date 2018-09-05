@@ -155,40 +155,8 @@ double rand_num(double max)
     return rand1;
 }
 
-int init_neural(struct neural_context * neural)
-{
-    int i,j,k;
-    struct neural_layer * obj = neural->layer;
-    struct neural_layer * layer_head = neural->layer;
-    struct neural_node * current_node = NULL;
-    struct neural_arg * arg = neural->arg;
-    int NUM_ALL_LAYER = arg->hidden_layer + 2;
-    int CURRENT_NUM_NODE,PREV_NUM_NODE;
-    rand_init();
-        
-    for(i = 0;i < NUM_ALL_LAYER;i++){
-        obj = obj->next_layer; 
-        current_node = obj->node;
-        CURRENT_NUM_NODE = arg->node_array[i];
-        for(j = 0;j < CURRENT_NUM_NODE;j++){
-            current_node = current_node->next_node;
-            current_node->out = 0;
-            if(0 == i){
-                current_node->out = 0;
-            }
-            else{
-                PREV_NUM_NODE = arg->node_array[i-1];
-                for(k = 0; k < PREV_NUM_NODE;k++){
-                    current_node->weight[k] = rand_num(1);
-                    current_node->delta_weight[k] = 0;
-                }
-            }
-        }
-    }
-    return 1;
-}
 
-int neural_run(struct neural_context * neural,struct neural_node *  input_data)
+int neural_run(struct neural_context * neural,struct neural_node *  input_data, int status)
 {
     int i,j,k;
     struct neural_layer * obj = neural->layer;
@@ -203,20 +171,51 @@ int neural_run(struct neural_context * neural,struct neural_node *  input_data)
         obj = obj->next_layer; 
         current_node = obj->node;
         CURRENT_NUM_NODE = arg->node_array[i];
+        if(INPUT_LAYER != i)
+            prev_layer_node = obj->prev_layer->node->next_node;
         for(j = 0;j < CURRENT_NUM_NODE;j++){
             current_node = current_node->next_node;
             current_node->out = 0;
-            if(0 == i){
-                input_data = input_data->next_node;
-                current_node->out = input_data->out;
+            if(INPUT_LAYER == i){
+                if(INIT == status){
+                    current_node->out = 0;
+                }
+                else if(FORECAST == status){
+                    input_data = input_data->next_node;
+                    current_node->out = input_data->out;
+                }
             }
-            else{                
-                prev_layer_node = obj->prev_layer->node;
+            else{            
                 PREV_NUM_NODE = arg->node_array[i-1];
-                for(k = 0; k < PREV_NUM_NODE;k++)
-                {
-                    obj->node->out += prev_layer_node->out * current_node->weight[k];
-                    prev_layer_node = prev_layer_node->next_node;
+                for(k = 0; k < PREV_NUM_NODE;k++){
+                    if(INIT == status){
+                        current_node->weight[k] = rand_num(1);
+                        current_node->delta_weight[k] = 0;
+                    }
+                    else if(FORECAST == status){
+                        current_node->out += prev_layer_node->out * current_node->weight[k];
+                        prev_layer_node = prev_layer_node->next_node;                        
+                    }
+                    else if(ADD_DELTA == status){
+                        current_node->weight[k] = current_node->weight[k] + current_node->delta_weight[k];
+                    }
+                    else if(GET_DELTA == status){
+                        ne->run(ne,input_data,FORECAST);
+                        out1 = data1->node;  
+                    
+
+                        
+                        current_node->weight[k] = ;
+                        ne->run(ne,data1,FORECAST);
+                        
+                        tmp1 = (out1 - data1);
+                        e = e + (tmp1 * tmp1);
+                        e = e/2;
+
+                        
+                        current_node->delta_weight[k] = e / PARTIAL_DERIVATIVES_COEFFICIENT;
+                        current_node->weight[k] = ;                       
+                    }
                 }
             }
         }
@@ -232,28 +231,25 @@ struct neural_context * neural_context_alloc(void)
         LEARN_ERR("alloc neural context error! \n");
         return NULL;
     }
+    rand_init();
+    
     obj->arg =  get_arch_arg();
     obj->layer = layers_context_alloc(obj->arg);
-
-    obj->init = init_neural;
     obj->run = neural_run;
-    obj->get_delta;
-    obj->para_iteration;
-    
-    
+  
     return obj;
 }
 
+
 int main()
 { 
-    ne = neural_context_alloc();    
-    ne->init(ne);
-    
-    ne->run(ne,inputdata);
-    ne->get_delta();
-    ne->para_iteration();
+    ne = neural_context_alloc();  
+    ne->run(ne,NULL,INIT);
+    ne->run(ne,NULL,GET_DELTA);
+    ne->run(ne,NULL,ADD_DELTA);
+    ne->run(ne,input_data,FORECAST);
 
-   
+    
 	return 0;
 }
 
