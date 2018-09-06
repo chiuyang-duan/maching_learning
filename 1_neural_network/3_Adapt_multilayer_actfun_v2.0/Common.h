@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <string.h>
 
-#define PARTIAL_DERIVATIVES_COEFFICIENT 0.001
+#define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.001 
 #define INPUT_LAYER 0
 #define HIDDEN_ONE_LAYER 1;
 #define INIT 0

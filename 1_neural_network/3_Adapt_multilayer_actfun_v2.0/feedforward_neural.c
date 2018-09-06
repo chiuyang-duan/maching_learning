@@ -181,6 +181,7 @@ int neural_run(struct neural_context * neural,struct neural_node *  input_data, 
                     current_node->out = 0;
                 }
                 else if(FORECAST == status){
+                    
                     input_data = input_data->next_node;
                     current_node->out = input_data->out;
                 }
@@ -201,22 +202,26 @@ int neural_run(struct neural_context * neural,struct neural_node *  input_data, 
                     }
                     else if(GET_DELTA == status){
                         ne->run(ne,input_data,FORECAST);
-                        out1 = data1->node;  
-                    
-
+                        e1 = 0;
+                        tmp2 = (real - input_data->next_node->out); 
+                        e1 = e1 + (tmp1 * tmp1);
+                        e1 = e1 / 2;    
+    
+                        temp_weight = current_node->weight[k];
+                        current_node->weight[k] = current_node->weight[k] + POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
+                        ne->run(ne,input_data,FORECAST);
+                        e2 = 0;
+                        tmp2 = (real - forecast);
+                        e2 = e2 + (tmp2 * tmp2);
+                        e2 = e2 / 2;
                         
-                        current_node->weight[k] = ;
-                        ne->run(ne,data1,FORECAST);
-                        
-                        tmp1 = (out1 - data1);
-                        e = e + (tmp1 * tmp1);
-                        e = e/2;
-
-                        
-                        current_node->delta_weight[k] = e / PARTIAL_DERIVATIVES_COEFFICIENT;
-                        current_node->weight[k] = ;                       
+                        current_node->delta_weight[k] = LEARNING_RATE * (e1- e2) / POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
+                        current_node->weight[k] = temp_weight;
                     }
                 }
+                if(FORECAST == status){
+                    current_node->out = act_squashing_function(current_node->out);                                         
+                }                
             }
         }
     }
