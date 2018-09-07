@@ -1,3 +1,4 @@
+#include "Common.h"
 
 /*
 study aim:
@@ -15,13 +16,13 @@ double data_out[2][TEST_NUM];
 
 void rand_init()
 {
-    LEARNING_LOG("rand_init\n");
+    LEARN_LOG("rand_init\n");
     srand((int)time(0)); 
 }
 double rand_num(double max)
 {
 	double rand1;
-    LEARNING_LOG("rand_num\n");
+    LEARN_LOG("rand_num\n");
 	rand1 = (((double)(rand()%1000)/1000.0 * (2 * max)) - max);
     return rand1;
 }
@@ -49,7 +50,7 @@ void make_study_data1()
 {
 
     int i;
-    LEARNING_LOG("make_study_data1\n");
+    LEARN_LOG("make_study_data1\n");
     printf("       y<x && y>0 && x<5.    \n"); 
     for(i = 0;i<TEST_NUM;i++)
     {
@@ -90,7 +91,7 @@ void make_study_data2()
 {
 
     int i;
-    LEARNING_LOG("make_study_data1\n");
+    LEARN_LOG("make_study_data1\n");
     printf("y < (x + 3) && y > (x-5)");
     for(i = 0;i<TEST_NUM;i++)
     {

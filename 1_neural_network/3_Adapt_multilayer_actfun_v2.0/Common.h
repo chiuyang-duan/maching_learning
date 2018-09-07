@@ -18,6 +18,20 @@
 #define ADD_DELTA 3 
 #define GET_DELTA 4
 
+
+#define DEBUG 1
+#if DEBUG
+#define LEARN_LOG(...) printf("Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
+                          printf(__VA_ARGS__); \
+                          printf("\n");
+#define LEARN_ERR(...) printf("ERR_Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
+                          printf(__VA_ARGS__); \
+                          printf("\n");
+#else
+#define LEARN_LOG(...)
+#define LEARN_ERR(...)
+#endif
+
 struct neural_node 
 {
     double *weight;

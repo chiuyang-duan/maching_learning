@@ -1,21 +1,6 @@
 #include "Common.h"
 
 
-#define DEBUG 1
-#if DEBUG
-#define LEARN_LOG(...) printf("Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
-                          printf(__VA_ARGS__); \
-                          printf("\n");
-#define LEARN_ERR(...) printf("ERR_Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
-                          printf(__VA_ARGS__); \
-                          printf("\n");
-
-#else
-#define LEARN_LOG(...)
-#define LEARN_ERR(...)
-
-#endif
-
 struct neural_context * ne = NULL;
 
 struct neural_arg * get_arch_arg(void)
@@ -190,7 +175,9 @@ int neural_run(struct neural_context * neural,struct neural_layer * data_list, i
             prev_layer_node = obj->prev_layer->node->next_node;
         for(j = 0;j < CURRENT_NUM_NODE;j++){
             current_node = current_node->next_node;
-            current_node->out = 0;
+            if(FORECAST == status)||(INIT == status){
+                current_node->out = 0;
+            }
             if(INPUT_LAYER == i){
                 if(INIT == status){
                     current_node->out = 0;
