@@ -1,0 +1,9 @@
+#ifndef DATA_GENERATION_H_INCLUDED
+#define DATA_GENERATION_H_INCLUDED
+
+
+#define TEST_NUM 30000
+
+
+
+#endif

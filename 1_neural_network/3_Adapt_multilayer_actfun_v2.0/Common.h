@@ -18,6 +18,8 @@
 #define ADD_DELTA 3 
 #define GET_DELTA 4
 
+#define LEARNING_RATE 0.01
+
 
 #define DEBUG 1
 #if DEBUG

@@ -1,7 +1,0 @@
-#ifndef DATA_RETRIEVAL_H_INCLUDED
-#define DATA_RETRIEVAL_H_INCLUDED
-
-
-
-
-#endif
