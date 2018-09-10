@@ -7,7 +7,7 @@ CFLAG	   := -Wall
 
 INCLUDES   := -I. 
 
-SRCS    = feedforward_neural.c Common.c  
+SRCS    = feedforward_neural.c Common.c data_generation.c  
 INCLUDE = Common.h data_retrieval.h
 
 OBJS    = $(SRCS:.c=.o)  

@@ -1,24 +1,10 @@
 #include "Common.h"
-
+#include "data_generation.h"
 
 struct neural_context * ne = NULL;
+struct neural_context * input_data = NULL;
 
-
-void rand_init()
-{
-    LEARN_LOG("rand_init\n");
-    srand((int)time(0)); 
-}
-double rand_num(double max)
-{
-	double rand1;
-    LEARN_LOG("rand_num\n");
-	rand1 = (((double)(rand()%1000)/1000.0 * (2 * max)) - max);
-    return rand1;
-}
-
-
-int neural_run(struct neural_context * neural,struct neural_layer * data_list, int status)
+int neural_run(struct neural_context * neural,struct neural_context * data_list, int status)
 {
     int i,j,k;
     struct neural_layer * obj = neural->layer;
@@ -35,13 +21,11 @@ int neural_run(struct neural_context * neural,struct neural_layer * data_list, i
     int CURRENT_NUM_NODE,PREV_NUM_NODE;
     double e1,e2,tmp1,tmp2,temp_weight;
 
-    input_data = data_list->next_layer->node;
-    
+    if((GET_DELTA == status)||(FORECAST == status)){
+        input_data = data_list->layer->next_layer->node;
+    }
     if(GET_DELTA == status){
-        last_layer = neural->layer;
-        while(NULL != last_layer->next_layer){
-            last_layer = last_layer->next_layer;
-        }  
+        last_layer = get_last_layer(neural);
     }
     
     for(i = 0;i < NUM_ALL_LAYER;i++){
@@ -52,7 +36,7 @@ int neural_run(struct neural_context * neural,struct neural_layer * data_list, i
             prev_layer_node = obj->prev_layer->node->next_node;
         for(j = 0;j < CURRENT_NUM_NODE;j++){
             current_node = current_node->next_node;
-            if(FORECAST == status)||(INIT == status){
+            if((FORECAST == status)||(INIT == status)){
                 current_node->out = 0;
             }
             if(INPUT_LAYER == i){
@@ -82,26 +66,26 @@ int neural_run(struct neural_context * neural,struct neural_layer * data_list, i
                         e1 = 0;
                         e2 = 0;
 
-                        learning_data = data_list->next_layer->next_layer->node;                    
+                        learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node;                    
                         neural->run(neural,data_list,FORECAST);
-                        while(NULL != learning_data->next_node)&&(NULL != result_data->next_node){
+                        while((NULL != learning_data->next_node)&&(NULL != result_data->next_node)){
                             learning_data = learning_data->next_node;
                             result_data = result_data->next_node;
                             tmp1 = (result_data->out - learning_data->out); 
                             e1 = e1 + (tmp1 * tmp1);    
                         }
                         e1 = e1 / 2.0;    
-
+                        printf("E = %lf \n",e1);
                         
                         temp_weight = current_node->weight[k];
                         current_node->weight[k] = current_node->weight[k] + POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
 
 
-                        learning_data = data_list->next_layer->next_layer->node;                    
+                        learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node;
                         neural->run(neural,data_list,FORECAST);
-                        while(NULL != learning_data->next_node)&&(NULL != result_data->next_node){
+                        while((NULL != learning_data->next_node)&&(NULL != result_data->next_node)){
                             learning_data = learning_data->next_node;
                             result_data = result_data->next_node;
                             tmp1 = (result_data->out - learning_data->out); 
@@ -125,7 +109,7 @@ int neural_run(struct neural_context * neural,struct neural_layer * data_list, i
 
 struct neural_context * neural_context_alloc(void)
 {
-    struct neural_context * obj = kzalloc(sizeof(*obj),GFP_USER);
+    struct neural_context * obj = (struct neural_context *)malloc(sizeof(*obj));
     LEARN_LOG("neural_context_alloc+++\n");
     if(!obj){
         LEARN_ERR("alloc neural context error! \n");
@@ -135,28 +119,38 @@ struct neural_context * neural_context_alloc(void)
     obj->arg =  get_arch_arg();
     obj->layer = layers_context_alloc(obj->arg);
     obj->run = neural_run;
+    obj->result_print = neural_result_print;
   
     return obj;
 }
 
 
+
 int main()
 { 
+    int i;
     rand_init();
 
     ne = neural_context_alloc();  
     input_data = input_data_context_alloc();
-    
+
     ne->run(ne,NULL,INIT);
+    scanf("%d",&i);
+/*
 
-    
-    ne->run(ne,input_data,GET_DELTA);
-    ne->run(ne,NULL,ADD_DELTA);
 
-    
-    ne->run(ne,input_data,FORECAST);
+    for(i = 0; i < LEARNING_NUM; i++){
+        make_study_data1(input_data);
+        ne->run(ne,input_data,GET_DELTA);
+        ne->run(ne,NULL,ADD_DELTA);
+    }
 
-    
+    while(1){
+        input_data->run(input_data,NULL,GET_FORECAST_DATA);
+        ne->run(ne,input_data,FORECAST);
+        ne->result_print(ne);
+    }
+*/    
 	return 0;
 }
 

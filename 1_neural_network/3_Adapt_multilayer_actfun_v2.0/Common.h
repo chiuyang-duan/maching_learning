@@ -9,6 +9,8 @@
 #include <memory.h>
 #include <string.h>
 
+
+
 #define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.001 
 #define INPUT_LAYER 0
 #define HIDDEN_ONE_LAYER 1;
@@ -24,15 +26,14 @@
 #define DEBUG 1
 #if DEBUG
 #define LEARN_LOG(...) printf("Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
-                          printf(__VA_ARGS__); \
-                          printf("\n");
+                          printf(__VA_ARGS__);
 #define LEARN_ERR(...) printf("ERR_Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
-                          printf(__VA_ARGS__); \
-                          printf("\n");
+                          printf(__VA_ARGS__);                         
 #else
 #define LEARN_LOG(...)
 #define LEARN_ERR(...)
 #endif
+
 
 struct neural_node 
 {
@@ -60,7 +61,15 @@ struct neural_context
 {
     struct neural_arg * arg;
     struct neural_layer * layer;
-    int (*run)(struct neural_arg * ,struct neural_layer *, int status);   
+    int (*run)(struct neural_context * ,struct neural_context * , int); 
+    int (*result_print)(struct neural_context * );
 };
+
+int neural_result_print(struct neural_context * );
+struct neural_layer * layers_context_alloc(struct neural_arg * );
+struct neural_node * node_context_alloc(struct neural_arg * ,int );
+struct neural_arg * get_arch_arg(void);
+struct neural_layer * get_last_layer(struct neural_context * );
+double act_squashing_function(double );
 
 #endif
