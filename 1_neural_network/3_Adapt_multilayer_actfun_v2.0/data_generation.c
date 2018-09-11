@@ -114,12 +114,11 @@ struct neural_arg * set_input_data_arg()
         return NULL;
     }
     
-    printf("pls input number of input_node:");
-    obj->input_node = INPUT_NODE;
-    
-    printf("\npls input number of output_node:");
+    printf("set_input_data_arg  obj->input_node = INPUT_NODE;\n");
+    obj->input_node = INPUT_NODE;    
+    printf("set_input_data_arg  obj->output_node = OUTPUT_NODE;\n");
     obj->output_node = OUTPUT_NODE;
-    printf("\npls input number of hidden layer:");
+    printf("set_input_data_arg  obj->hidden_layer = 0;\n");
     obj->hidden_layer = 0;
     
     OUTPUT_LAYER = obj->hidden_layer+1;
@@ -146,21 +145,7 @@ int run_get_input_data(struct neural_context * neural,struct neural_context * da
     neural->layer->next_layer->node->next_node->next_node->out = y;
     return 0;
 }
-struct neural_context * input_data_context_alloc(void)
-{
-    struct neural_context * obj = (struct neural_context *)malloc(sizeof(*obj));
-    LEARN_LOG("neural_context_alloc+++\n");
-    if(!obj){
-        LEARN_ERR("alloc neural context error! \n");
-        return NULL;
-    }
-    
-    obj->arg = set_input_data_arg();
-    obj->layer = layers_context_alloc(obj->arg);
-    obj->run = run_get_input_data;
-    obj->result_print = NULL;
-    return obj;
-}
+
 
 
 

@@ -98,7 +98,7 @@ struct neural_arg * get_arch_arg(void)
 #if DEBUG
     LEARN_LOG("arg success \n");
     for(i = 0; i < OUTPUT_LAYER+1; i++){
-        LEARN_LOG("obj->node_array[%d]=%d",i,obj->node_array[i]);
+        LEARN_LOG("obj->node_array[%d]=%d \n",i,obj->node_array[i]);
     }
 #endif    
 
@@ -112,7 +112,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
     struct neural_node * head = NULL;
     
     struct neural_node * obj = (struct neural_node *)malloc(sizeof(*obj));
-    LEARN_LOG("layers_context_alloc+++\n");
+    LEARN_LOG("node_context_alloc+++\n");
     if(!obj){
         LEARN_ERR("alloc layers context error! \n");
         return NULL;
@@ -128,6 +128,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
     for(i = 0; i < arg->node_array[num_current_layer]; i++)
     {
         obj->next_node = (struct neural_node *)malloc(sizeof(struct neural_node));
+        LEARN_LOG("node_context_alloc+++\n");
         if(!obj->next_node){
             LEARN_ERR("alloc layers context error! \n");
             return NULL;
@@ -142,11 +143,13 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
         }
         else{
             obj->weight = (double *)malloc(arg->node_array[num_current_layer-1] * sizeof(double));
+            LEARN_LOG("obj->weight alloc+++\n");
             if(!obj->weight){
                 LEARN_ERR(" alloc weight error ! \n");
                 return NULL;
             }          
             obj->delta_weight = (double *)malloc(arg->node_array[num_current_layer-1] * sizeof(double));
+            LEARN_LOG("obj->delta_weight alloc+++\n");
             if(!obj->delta_weight){
                 LEARN_ERR(" alloc delta weight error ! \n");
                 return NULL;
@@ -169,7 +172,7 @@ struct neural_layer * layers_context_alloc(struct neural_arg * arg)
         return NULL;
     }
     obj->next_layer = NULL;
-    obj->node = NULL;
+    obj->node = node_context_alloc(arg,0);
     head = obj;    
     obj->prev_layer = NULL;
 

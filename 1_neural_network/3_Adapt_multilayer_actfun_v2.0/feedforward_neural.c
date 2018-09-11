@@ -1,11 +1,12 @@
 #include "Common.h"
 #include "data_generation.h"
 
-struct neural_context * ne = NULL;
-struct neural_context * input_data = NULL;
+struct neural_context *ne;
+struct neural_context *input_data;
 
 int neural_run(struct neural_context * neural,struct neural_context * data_list, int status)
 {
+    int prev_num;
     int i,j,k;
     struct neural_layer * obj = neural->layer;
     struct neural_layer * layer_head = neural->layer;
@@ -21,20 +22,22 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
     int CURRENT_NUM_NODE,PREV_NUM_NODE;
     double e1,e2,tmp1,tmp2,temp_weight;
 
-    if((GET_DELTA == status)||(FORECAST == status)){
+    if(NULL != data_list){
         input_data = data_list->layer->next_layer->node;
     }
-    if(GET_DELTA == status){
+    if(NULL != neural){
         last_layer = get_last_layer(neural);
     }
     
     for(i = 0;i < NUM_ALL_LAYER;i++){
+        LEARN_LOG("i = %d status = %d\n",i,status);
         obj = obj->next_layer; 
         current_node = obj->node;
         CURRENT_NUM_NODE = arg->node_array[i];
         if(INPUT_LAYER != i)
             prev_layer_node = obj->prev_layer->node->next_node;
         for(j = 0;j < CURRENT_NUM_NODE;j++){
+            LEARN_LOG("j = %d status = %d\n",j,status);
             current_node = current_node->next_node;
             if((FORECAST == status)||(INIT == status)){
                 current_node->out = 0;
@@ -45,17 +48,20 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                 }
                 else if(FORECAST == status){
                     input_data = input_data->next_node;
-                    current_node->out = input_data->out;
+                    current_node->out = input_data->out;           
                 }
             }
-            else{            
-                PREV_NUM_NODE = arg->node_array[i-1];
+            else{
+                prev_num = i-1;
+                PREV_NUM_NODE = arg->node_array[prev_num];
                 for(k = 0; k < PREV_NUM_NODE;k++){
+                    LEARN_LOG("k = %d status = %d\n",k,status);
                     if(INIT == status){
                         current_node->weight[k] = rand_num(1);
                         current_node->delta_weight[k] = 0;
                     }
                     else if(FORECAST == status){
+                        LEARN_LOG("current_node->out = %lf,\nprev_layer_node->out = %lf\n",current_node->out,prev_layer_node->out);
                         current_node->out += prev_layer_node->out * current_node->weight[k];
                         prev_layer_node = prev_layer_node->next_node;                        
                     }
@@ -65,10 +71,12 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                     else if(GET_DELTA == status){                        
                         e1 = 0;
                         e2 = 0;
-
+                    
                         learning_data = data_list->layer->next_layer->next_layer->node;                    
-                        result_data = last_layer->node;                    
+                        result_data = last_layer->node; 
+                        LEARN_LOG("1 neural->run(neural,data_list,FORECAST);\n");
                         neural->run(neural,data_list,FORECAST);
+                        
                         while((NULL != learning_data->next_node)&&(NULL != result_data->next_node)){
                             learning_data = learning_data->next_node;
                             result_data = result_data->next_node;
@@ -84,6 +92,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
 
                         learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node;
+                        LEARN_LOG("2 neural->run(neural,data_list,FORECAST);\n");
                         neural->run(neural,data_list,FORECAST);
                         while((NULL != learning_data->next_node)&&(NULL != result_data->next_node)){
                             learning_data = learning_data->next_node;
@@ -107,41 +116,46 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
     return 1;
 }
 
+struct neural_context obj_ne = {
+    .run = neural_run,
+    .result_print = neural_result_print,
+};
+
+struct neural_context obj_input_data = {
+    .run = run_get_input_data,
+    .result_print =NULL,
+};
+
 struct neural_context * neural_context_alloc(void)
 {
-    struct neural_context * obj = (struct neural_context *)malloc(sizeof(*obj));
-    LEARN_LOG("neural_context_alloc+++\n");
-    if(!obj){
-        LEARN_ERR("alloc neural context error! \n");
-        return NULL;
-    }
-    
-    obj->arg =  get_arch_arg();
-    obj->layer = layers_context_alloc(obj->arg);
-    obj->run = neural_run;
-    obj->result_print = neural_result_print;
-  
-    return obj;
+    obj_ne.arg =  get_arch_arg();
+    obj_ne.layer = layers_context_alloc(obj_ne.arg);
+    return &obj_ne;
 }
-
+struct neural_context * input_data_context_alloc(void)
+{
+    obj_input_data.arg = set_input_data_arg();
+    obj_input_data.layer = layers_context_alloc(obj_input_data.arg);
+    return &obj_input_data;
+}
 
 
 int main()
 { 
     int i;
     rand_init();
-
+    
     ne = neural_context_alloc();  
     input_data = input_data_context_alloc();
-
+    LEARN_LOG("ne->run(ne,NULL,INIT);\n");
     ne->run(ne,NULL,INIT);
-    scanf("%d",&i);
-/*
 
 
     for(i = 0; i < LEARNING_NUM; i++){
         make_study_data1(input_data);
+        LEARN_LOG("ne->run(ne,input_data,GET_DELTA);\n");
         ne->run(ne,input_data,GET_DELTA);
+        LEARN_LOG("ne->run(ne,NULL,ADD_DELTA);\n");
         ne->run(ne,NULL,ADD_DELTA);
     }
 
@@ -150,7 +164,7 @@ int main()
         ne->run(ne,input_data,FORECAST);
         ne->result_print(ne);
     }
-*/    
+   
 	return 0;
 }
 
