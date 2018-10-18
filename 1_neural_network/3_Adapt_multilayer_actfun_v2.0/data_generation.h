@@ -3,7 +3,7 @@
 #include "Common.h"
 
 #define GET_FORECAST_DATA 1
-#define LEARNING_NUM 1
+
 #define INPUT_NODE 2
 #define OUTPUT_NODE 2
 struct neural_context * input_data_context_alloc(void);

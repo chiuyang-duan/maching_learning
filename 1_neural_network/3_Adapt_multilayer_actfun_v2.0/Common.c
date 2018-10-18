@@ -32,7 +32,7 @@ void normal_zscore(double * inputdata, int length, double * outdata)
     int i =0;
 
     outdata = (double *)malloc(length*sizeof(double));     
-    
+    LEARN_LOG("malloc  outdata \n");
     for(i = 0; i < length; i++)
     {
         u = u + inputdata[i];            
@@ -53,8 +53,19 @@ void normal_zscore(double * inputdata, int length, double * outdata)
 struct neural_layer * get_last_layer(struct neural_context * temp_neural)
 {
     struct neural_layer * obj_last_layer = NULL;
+#if DEBUG
+    int i = 0;
+#endif
     obj_last_layer = temp_neural->layer;
+#if DEBUG
+
+    LEARN_LOG("layer %d\n",i);
+#endif
     while(NULL != obj_last_layer->next_layer){
+#if DEBUG
+        i++;
+        LEARN_LOG("layer %d\n",i);
+#endif
         obj_last_layer = obj_last_layer->next_layer;
     }
     return obj_last_layer;
@@ -66,7 +77,7 @@ struct neural_arg * get_arch_arg(void)
     int OUTPUT_LAYER;
     
     struct neural_arg * obj = (struct neural_arg *)malloc(sizeof(*obj));
-    LEARN_LOG("get_arch_arg+++\n");
+    LEARN_LOG("malloc neural_arg\n");
     if(!obj){
         LEARN_ERR("alloc neural arch argument error! \n");
         return NULL;
@@ -112,7 +123,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
     struct neural_node * head = NULL;
     
     struct neural_node * obj = (struct neural_node *)malloc(sizeof(*obj));
-    LEARN_LOG("node_context_alloc+++\n");
+    LEARN_LOG("malloc neural_node\n");
     if(!obj){
         LEARN_ERR("alloc layers context error! \n");
         return NULL;
@@ -128,7 +139,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
     for(i = 0; i < arg->node_array[num_current_layer]; i++)
     {
         obj->next_node = (struct neural_node *)malloc(sizeof(struct neural_node));
-        LEARN_LOG("node_context_alloc+++\n");
+        LEARN_LOG("malloc neural_node\n");
         if(!obj->next_node){
             LEARN_ERR("alloc layers context error! \n");
             return NULL;
@@ -165,12 +176,13 @@ struct neural_layer * layers_context_alloc(struct neural_arg * arg)
     int i;
     struct neural_layer * head = NULL; 
     int NUM_ALL_LAYER = arg->hidden_layer + 2; 
-    struct neural_layer * obj = (struct neural_layer *)malloc(sizeof(*obj));
-    LEARN_LOG("layers_context_alloc+++\n");
+    struct neural_layer * obj = (struct neural_layer *)malloc(sizeof(*obj));    
     if(!obj){
         LEARN_ERR("alloc layers context error! \n");
         return NULL;
     }
+    LEARN_LOG("malloc neural_layer ++\n");
+    
     obj->next_layer = NULL;
     obj->node = node_context_alloc(arg,0);
     head = obj;    
@@ -179,7 +191,7 @@ struct neural_layer * layers_context_alloc(struct neural_arg * arg)
     for(i = 0; i < NUM_ALL_LAYER; i++)
     {
         obj->next_layer = (struct neural_layer *)malloc(sizeof(struct neural_layer));
-        LEARN_LOG("layers_context_alloc+++\n");
+        LEARN_LOG("malloc neural_layer ++\n");
         if(!obj){
             LEARN_ERR("alloc layers context error! \n");
             return NULL;

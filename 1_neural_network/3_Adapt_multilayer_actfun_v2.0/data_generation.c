@@ -127,6 +127,7 @@ struct neural_arg * set_input_data_arg()
         LEARN_LOG("malloc error \n");
     }
     memset(obj->node_array,0,(obj->hidden_layer+2) * sizeof(int));
+    LEARN_LOG("malloc obj->node_array %d\n",(obj->hidden_layer+2));
 
     obj->node_array[INPUT_LAYER] = obj->input_node;
     obj->node_array[OUTPUT_LAYER] = obj->output_node;

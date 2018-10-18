@@ -20,14 +20,15 @@
 #define ADD_DELTA 3 
 #define GET_DELTA 4
 
-#define LEARNING_RATE 0.01
+#define LEARNING_RATE 0.1
+#define LEARNING_NUM 2
 
 
 #define DEBUG 1
 #if DEBUG
-#define LEARN_LOG(...) printf("Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
+#define LEARN_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
                           printf(__VA_ARGS__);
-#define LEARN_ERR(...) printf("ERR_Filename %s, Function %s, Line %d > ", __FILE__, __FUNCTION__, __LINE__); \
+#define LEARN_ERR(...) printf("ERR_File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
                           printf(__VA_ARGS__);                         
 #else
 #define LEARN_LOG(...)
