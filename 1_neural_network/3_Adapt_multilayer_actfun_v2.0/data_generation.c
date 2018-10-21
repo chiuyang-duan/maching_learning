@@ -37,8 +37,8 @@ int make_study_data1(struct neural_context * input_data)
     LEARN_LOG("make_study_data1\n");
     printf("       y<x && y>0 && x<5.    \n"); 
 
-    data_x[0] = rand_num(10);
-    data_x[1] = rand_num(10);
+    data_x[0] = rand_num(10.0);
+    data_x[1] = rand_num(10.0);
     
     if((data_x[1] < data_x[0])&&(data_x[1] > 0)&&(data_x[0] < 5))
     {
@@ -115,7 +115,7 @@ struct neural_arg * set_input_data_arg()
     }
     
     printf("set_input_data_arg  obj->input_node = INPUT_NODE;\n");
-    obj->input_node = INPUT_NODE;    
+    obj->input_node = INPUT_NODE + DUMMY_NODE;    
     printf("set_input_data_arg  obj->output_node = OUTPUT_NODE;\n");
     obj->output_node = OUTPUT_NODE;
     printf("set_input_data_arg  obj->hidden_layer = 0;\n");

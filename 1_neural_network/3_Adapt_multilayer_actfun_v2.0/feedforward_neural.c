@@ -24,7 +24,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
     double e1,e2,tmp1,tmp2,temp_weight;
 
     if(NULL != data_list){
-        LEARN_LOG("input_data = data_list->layer->next_layer->node\n");
+        DEPOINT_LOG("input_data = data_list->layer->next_layer->node\n");
         input_data = data_list->layer->next_layer->node;
     }
     if(NULL != neural){
@@ -35,28 +35,30 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
         LEARN_LOG("layer i: %d status: %d\n",i,status);
         LEARN_LOG("obj = obj->next_layer;\n");
         obj = obj->next_layer; 
-        LEARN_LOG("current_node = obj->node;\n");
+        DEPOINT_LOG("current_node = obj->node;\n");
         current_node = obj->node;
         CURRENT_NUM_NODE = arg->node_array[i];
         if(INPUT_LAYER != i)
-            LEARN_LOG("prev_layer_node = obj->prev_layer->node->next_node;\n");
+        {
+            DEPOINT_LOG("prev_layer_node = obj->prev_layer->node->next_node;\n");
             prev_layer_node = obj->prev_layer->node->next_node;
             temp_prev_layer_node = prev_layer_node;
+        }
         for(j = 0;j < CURRENT_NUM_NODE;j++){
             LEARN_LOG("node j: %d status: %d\n",j,status);
-            LEARN_LOG("current_node = current_node->next_node;\n");
+            DEPOINT_LOG("current_node = current_node->next_node;\n");
             temp_prev_layer_node = prev_layer_node;
             current_node = current_node->next_node;
             
             if((FORECAST == status)||(INIT == status)){
-                current_node->out = 0;
+                current_node->out = DUMMY;
             }
             if(INPUT_LAYER == i){
                 if(INIT == status){
-                    current_node->out = 0;
+                    current_node->out = DUMMY;
                 }
                 else if(FORECAST == status){
-                    LEARN_LOG("input_data = input_data->next_node;\n");
+                    DEPOINT_LOG("input_data = input_data->next_node;\n");
                     input_data = input_data->next_node;
                     current_node->out = input_data->out;           
                 }
@@ -67,14 +69,20 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                 for(k = 0; k < PREV_NUM_NODE;k++){
                     LEARN_LOG("prev num node weight k: %d status: %d\n",k,status);
                     if(INIT == status){
-                        current_node->weight[k] = rand_num(1);
-                        current_node->delta_weight[k] = 0;
+                        current_node->weight[k] = ((((float)(rand()%1000))/1000.0 * (2.0 * 1.0)) - 1.0);
+                        DATA_LOG("current_node->weight[%d]=%lf \n",k,current_node->weight[k]);
+                        current_node->delta_weight[k] = 0.0;
                     }
                     else if(FORECAST == status){
-                        LEARN_LOG("current_node->out = %lf,\nprev_layer_node->out = %lf\n",current_node->out,prev_layer_node->out);
-                        current_node->out += temp_prev_layer_node->out * current_node->weight[k];
-                        LEARN_LOG("prev_layer_node = prev_layer_node->next_node;\n");
-                        temp_prev_layer_node = temp_prev_layer_node->next_node;                        
+                        if(((PREV_NUM_NODE - 1) == k) && ((NUM_ALL_LAYER - 1) != i)){
+                            current_node->out = DUMMY;
+                        }
+                        else{
+                            LEARN_LOG("current_node->weight[%d] = %lf \n",k,current_node->weight[k]);
+                            current_node->out += temp_prev_layer_node->out * current_node->weight[k];
+                            DEPOINT_LOG("prev_layer_node = prev_layer_node->next_node;\n");
+                            temp_prev_layer_node = temp_prev_layer_node->next_node;
+                        }
                     }
                     else if(ADD_DELTA == status){
                         current_node->weight[k] = current_node->weight[k] + current_node->delta_weight[k];
@@ -82,7 +90,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                     else if(GET_DELTA == status){                        
                         e1 = 0;
                         e2 = 0;
-                        LEARN_LOG("learning_data = data_list->layer->next_layer->next_layer->node;\n");
+                        DEPOINT_LOG("learning_data = data_list->layer->next_layer->next_layer->node;\n");
                         learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node; 
                         LEARN_LOG("1 neural->run(neural,data_list,FORECAST);\n");
@@ -94,8 +102,9 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                             tmp1 = (result_data->out - learning_data->out); 
                             e1 = e1 + (tmp1 * tmp1);    
                         }
-                        e1 = e1 / neural->arg->output_node;
-                        printf("E1 = %lf \n",e1);
+                        //e1 = e1 / 2.0;
+                        e1 = e1 / ((double)(neural->arg->output_node));
+                        printf("E1 = %lf ,((double)(neural->arg->output_node))%d \n",e1,neural->arg->output_node);
                         
                         temp_weight = current_node->weight[k];
                         current_node->weight[k] = current_node->weight[k] + POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
@@ -111,7 +120,8 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                             tmp1 = (result_data->out - learning_data->out); 
                             e2 = e2 + (tmp1 * tmp1);    
                         }
-                        e2 = e2 / neural->arg->output_node;    
+                        //e2 = e2 / 2.0;
+                        e2 = e2 / ((double)(neural->arg->output_node));   
                         printf("E2 = %lf \n",e2);
                         
                         current_node->delta_weight[k] = LEARNING_RATE * (e1 - e2) / POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
@@ -154,8 +164,9 @@ struct neural_context * input_data_context_alloc(void)
 int main()
 { 
     int i;
+
     rand_init();
-    
+
     ne = neural_context_alloc();  
     input_data = input_data_context_alloc();
     LEARN_LOG("ne->run(ne,NULL,INIT);\n");

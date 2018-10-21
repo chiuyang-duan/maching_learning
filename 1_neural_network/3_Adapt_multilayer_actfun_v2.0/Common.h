@@ -21,10 +21,14 @@
 #define GET_DELTA 4
 
 #define LEARNING_RATE 0.1
-#define LEARNING_NUM 2
+#define LEARNING_NUM 20000
+#define DUMMY_NODE 1
+#define DUMMY -1.0
 
+#define DEBUG 0
+#define DEBUG_POINT 0
+#define DEBUG_DATA 0
 
-#define DEBUG 1
 #if DEBUG
 #define LEARN_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
                           printf(__VA_ARGS__);
@@ -34,6 +38,19 @@
 #define LEARN_LOG(...)
 #define LEARN_ERR(...)
 #endif
+#if DEBUG_POINT
+#define DEPOINT_LOG(...) printf("ERR_File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
+                          printf(__VA_ARGS__);    
+#else
+#define DEPOINT_LOG(...)
+#endif
+#if DEBUG_DATA
+#define DATA_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
+                          printf(__VA_ARGS__);    
+#else
+#define DATA_LOG(...)
+#endif
+
 
 
 struct neural_node 

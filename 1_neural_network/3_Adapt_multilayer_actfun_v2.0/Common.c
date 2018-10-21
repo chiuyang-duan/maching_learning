@@ -6,29 +6,29 @@ void rand_init()
 }
 double rand_num(double max)
 {
-	double rand1;
+	float rand1;
     LEARN_LOG("rand_num\n");
-	rand1 = (((double)(rand()%1000)/1000.0 * (2 * max)) - max);
+	rand1 = ((((float)(rand()%1000))/1000.0 * (2.0 * max)) - max);
     return rand1;
 }
 
 double act_squashing_function(double x)
 {
-	return (1/(1+(exp(-x))));
+	return (1.0/(1.0+(exp(-x))));
 }
 
 double act_step_function(double x)
 {
 	if(0 <= x)
-		return 1;
-	return 0;
+		return 1.0;
+	return 0.0;
 }
 
 void normal_zscore(double * inputdata, int length, double * outdata)
 {
-    double u = 0;
-    double sigma = 0; 
-    double a = 0;
+    double u = 0.0;
+    double sigma = 0.0; 
+    double a = 0.0;
     int i =0;
 
     outdata = (double *)malloc(length*sizeof(double));     
@@ -85,7 +85,7 @@ struct neural_arg * get_arch_arg(void)
     
     printf("pls input number of input_node:");
     scanf("%d",&obj->input_node);
-    
+    obj->input_node = obj->input_node + DUMMY_NODE;
     printf("pls input number of output_node:");
     scanf("%d",&obj->output_node);
     printf("pls input number of hidden layer:");
@@ -101,8 +101,9 @@ struct neural_arg * get_arch_arg(void)
 
     obj->node_array[INPUT_LAYER] = obj->input_node;
     for(i = 1; i < OUTPUT_LAYER; i++){
-        printf("\npls input %d_layer_node_num:",i+1);
+        printf("pls input %d_layer_node_num:",i+1);
         scanf("%d",&obj->node_array[i]);
+        obj->node_array[i] = obj->node_array[i] + DUMMY_NODE;
     }
     obj->node_array[OUTPUT_LAYER] = obj->output_node;
 
@@ -129,7 +130,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
         return NULL;
     }  
     obj->delta_weight = NULL;
-    obj->out = 0;
+    obj->out = DUMMY;
     obj->weight = NULL;
     obj->next_node = NULL;
     obj->prev_node = NULL;
@@ -147,6 +148,7 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
         obj->next_node->prev_node = obj;
         obj = obj->next_node;
         obj->next_node = NULL;
+        obj->out = DUMMY;
         
         if(INPUT_LAYER == num_current_layer){    
             obj->weight = NULL;
@@ -158,13 +160,15 @@ struct neural_node * node_context_alloc(struct neural_arg * arg,int num_current_
             if(!obj->weight){
                 LEARN_ERR(" alloc weight error ! \n");
                 return NULL;
-            }          
+            }
+            memset(obj->weight,0,(arg->node_array[num_current_layer-1] * sizeof(double)));
             obj->delta_weight = (double *)malloc(arg->node_array[num_current_layer-1] * sizeof(double));
             LEARN_LOG("obj->delta_weight alloc+++\n");
             if(!obj->delta_weight){
                 LEARN_ERR(" alloc delta weight error ! \n");
                 return NULL;
             }
+            memset(obj->delta_weight,0,(arg->node_array[num_current_layer-1] * sizeof(double)));
         }
     }
     return head;
