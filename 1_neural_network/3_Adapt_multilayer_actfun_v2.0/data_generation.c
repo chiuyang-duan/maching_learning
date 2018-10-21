@@ -36,9 +36,9 @@ int make_study_data1(struct neural_context * input_data)
     double data_out[2];
     LEARN_LOG("make_study_data1\n");
     printf("       y<x && y>0 && x<5.    \n"); 
-
     data_x[0] = rand_num(10.0);
     data_x[1] = rand_num(10.0);
+    //DATA_LOG("data_x[0]=%lf, data_x[1]=%lf\n",data_x[0],data_x[1]);
     
     if((data_x[1] < data_x[0])&&(data_x[1] > 0)&&(data_x[0] < 5))
     {

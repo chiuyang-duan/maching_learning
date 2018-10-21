@@ -6,9 +6,9 @@ void rand_init()
 }
 double rand_num(double max)
 {
-	float rand1;
+	double rand1;
     LEARN_LOG("rand_num\n");
-	rand1 = ((((float)(rand()%1000))/1000.0 * (2.0 * max)) - max);
+	rand1 = ((((double)(rand()%1000))/1000.0 * (2.0 * max)) - max);
     return rand1;
 }
 

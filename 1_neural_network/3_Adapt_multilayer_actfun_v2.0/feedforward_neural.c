@@ -4,6 +4,7 @@
 struct neural_context *ne;
 struct neural_context *input_data;
 
+
 int neural_run(struct neural_context * neural,struct neural_context * data_list, int status)
 {
     int prev_num;
@@ -69,8 +70,8 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                 for(k = 0; k < PREV_NUM_NODE;k++){
                     LEARN_LOG("prev num node weight k: %d status: %d\n",k,status);
                     if(INIT == status){
-                        current_node->weight[k] = ((((float)(rand()%1000))/1000.0 * (2.0 * 1.0)) - 1.0);
-                        DATA_LOG("current_node->weight[%d]=%lf \n",k,current_node->weight[k]);
+                        current_node->weight[k] = rand_num(1.0);                        
+                        DATA_LOG("current_node->weight[%d]=%lf \n",k,current_node->weight[k]);                    
                         current_node->delta_weight[k] = 0.0;
                     }
                     else if(FORECAST == status){
@@ -128,7 +129,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         current_node->weight[k] = temp_weight;
                     }
                 }
-                if(FORECAST == status){
+                if(FORECAST == status){                   
                     current_node->out = act_squashing_function(current_node->out);                                         
                 }                
             }
@@ -166,6 +167,7 @@ int main()
     int i;
 
     rand_init();
+    
 
     ne = neural_context_alloc();  
     input_data = input_data_context_alloc();

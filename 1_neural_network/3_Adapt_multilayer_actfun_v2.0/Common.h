@@ -13,7 +13,7 @@
 
 #define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.001 
 #define INPUT_LAYER 0
-#define HIDDEN_ONE_LAYER 1;
+#define HIDDEN_ONE_LAYER 1
 #define INIT 0
 #define LEARNING 1
 #define FORECAST 2 
@@ -21,13 +21,13 @@
 #define GET_DELTA 4
 
 #define LEARNING_RATE 0.1
-#define LEARNING_NUM 20000
+#define LEARNING_NUM 2
 #define DUMMY_NODE 1
 #define DUMMY -1.0
 
-#define DEBUG 0
+#define DEBUG 1
 #define DEBUG_POINT 0
-#define DEBUG_DATA 0
+#define DEBUG_DATA 1
 
 #if DEBUG
 #define LEARN_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
@@ -89,5 +89,8 @@ struct neural_node * node_context_alloc(struct neural_arg * ,int );
 struct neural_arg * get_arch_arg(void);
 struct neural_layer * get_last_layer(struct neural_context * );
 double act_squashing_function(double );
+double rand_num(double max);
+double act_squashing_function(double x);
+
 
 #endif
