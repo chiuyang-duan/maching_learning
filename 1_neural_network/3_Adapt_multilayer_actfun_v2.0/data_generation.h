@@ -3,6 +3,8 @@
 #include "Common.h"
 
 #define GET_FORECAST_DATA 1
+#define TEST_DATA 2
+
 
 #define INPUT_NODE 2
 #define OUTPUT_NODE 2

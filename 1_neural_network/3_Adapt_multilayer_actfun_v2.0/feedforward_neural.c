@@ -46,13 +46,14 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
             temp_prev_layer_node = prev_layer_node;
         }
         for(j = 0;j < CURRENT_NUM_NODE;j++){
+            LEARN_LOG("(j = 0;j < CURRENT_NUM_NODE = %d;j++){\n",CURRENT_NUM_NODE);
             LEARN_LOG("node j: %d status: %d\n",j,status);
             DEPOINT_LOG("current_node = current_node->next_node;\n");
             temp_prev_layer_node = prev_layer_node;
             current_node = current_node->next_node;
             
             if((FORECAST == status)||(INIT == status)){
-                current_node->out = DUMMY;
+                current_node->out = 0.0;
             }
             if(INPUT_LAYER == i){
                 if(INIT == status){
@@ -61,12 +62,14 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                 else if(FORECAST == status){
                     DEPOINT_LOG("input_data = input_data->next_node;\n");
                     input_data = input_data->next_node;
-                    current_node->out = input_data->out;           
+                    current_node->out = input_data->out;   
+                    LEARN_LOG("current_node->out = %lf\n",current_node->out);
                 }
             }
             else{
                 prev_num = i-1;
                 PREV_NUM_NODE = arg->node_array[prev_num];
+                LEARN_LOG("(k = 0; k < PREV_NUM_NODE = %d ;k++)\n",PREV_NUM_NODE);
                 for(k = 0; k < PREV_NUM_NODE;k++){
                     LEARN_LOG("prev num node weight k: %d status: %d\n",k,status);
                     if(INIT == status){
@@ -75,14 +78,24 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         current_node->delta_weight[k] = 0.0;
                     }
                     else if(FORECAST == status){
-                        if(((PREV_NUM_NODE - 1) == k) && ((NUM_ALL_LAYER - 1) != i)){
+                        if(((CURRENT_NUM_NODE - 1) == j) && ((NUM_ALL_LAYER - 1) != i)){
                             current_node->out = DUMMY;
+                            LEARN_LOG("current_node->out = %lf\n",current_node->out);
                         }
-                        else{
-                            LEARN_LOG("current_node->weight[%d] = %lf \n",k,current_node->weight[k]);
-                            current_node->out += temp_prev_layer_node->out * current_node->weight[k];
-                            DEPOINT_LOG("prev_layer_node = prev_layer_node->next_node;\n");
-                            temp_prev_layer_node = temp_prev_layer_node->next_node;
+                        else{                        
+                            if((PREV_NUM_NODE - 1) == k){
+                                LEARN_LOG("out %lf += -1 * weight[%d] %lf;\n",current_node->out,k,current_node->weight[k]);
+                                current_node->out += DUMMY * current_node->weight[k];
+                                LEARN_LOG("current_node->out = %lf\n",current_node->out);
+                                LEARN_LOG("--------------------------------------------------\n\n");
+                            }
+                            else{
+                                LEARN_LOG("out %lf += prev->out %lf * weight[%d] %lf;\n",current_node->out,temp_prev_layer_node->out,k,current_node->weight[k]);
+                                current_node->out += temp_prev_layer_node->out * current_node->weight[k];
+                                LEARN_LOG("out = %lf \n",current_node->out);
+                                DEPOINT_LOG("prev_layer_node = prev_layer_node->next_node;\n");
+                                temp_prev_layer_node = temp_prev_layer_node->next_node;
+                            }
                         }
                     }
                     else if(ADD_DELTA == status){
@@ -94,7 +107,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         DEPOINT_LOG("learning_data = data_list->layer->next_layer->next_layer->node;\n");
                         learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node; 
-                        LEARN_LOG("1 neural->run(neural,data_list,FORECAST);\n");
+                        LEARN_LOG("\n\n 1 neural->run(neural,data_list,FORECAST);\n\n");
                         neural->run(neural,data_list,FORECAST);
                         
                         while((NULL != learning_data->next_node)&&(NULL != result_data->next_node)){
@@ -109,7 +122,6 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         
                         temp_weight = current_node->weight[k];
                         current_node->weight[k] = current_node->weight[k] + POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
-//wheather have NULL node   2  2.0??
 
                         learning_data = data_list->layer->next_layer->next_layer->node;                    
                         result_data = last_layer->node;
@@ -165,22 +177,34 @@ struct neural_context * input_data_context_alloc(void)
 int main()
 { 
     int i;
-
+ /*   
+    struct neural_arg test_arg;
+    struct neural_context test_data;
+    test_data.arg = &test_arg;
+    test_data.arg.input_node = -10;
+    */
+    
     rand_init();
     
-
     ne = neural_context_alloc();  
     input_data = input_data_context_alloc();
-    LEARN_LOG("ne->run(ne,NULL,INIT);\n");
+    LEARN_LOG("\n\nne->run(ne,NULL,INIT);\n\n");
     ne->run(ne,NULL,INIT);
 
 
     for(i = 0; i < LEARNING_NUM; i++){
         make_study_data1(input_data);
-        LEARN_LOG("ne->run(ne,input_data,GET_DELTA);\n");
+        LEARN_LOG("\n\nne->run(ne,input_data,GET_DELTA);\n\n");
         ne->run(ne,input_data,GET_DELTA);
-        LEARN_LOG("ne->run(ne,NULL,ADD_DELTA);\n");
+        LEARN_LOG("\n\nne->run(ne,NULL,ADD_DELTA);\n\n");
         ne->run(ne,NULL,ADD_DELTA);
+    }
+
+    for(i = 0;i < 400;i++){       
+        input_data->run(input_data,NULL,TEST_DATA);
+        ne->run(ne,input_data,FORECAST);
+        ne->result_print(ne);
+        //printf("%d ",i);
     }
 
     while(1){

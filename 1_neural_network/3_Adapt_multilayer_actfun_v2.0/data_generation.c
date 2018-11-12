@@ -136,12 +136,27 @@ struct neural_arg * set_input_data_arg()
     return obj;
 
 }
+double x = -5;
+double y = 5;
 int run_get_input_data(struct neural_context * neural,struct neural_context * data_list, int status)
 {
-    double x,y;
 
-    printf("pls input test data x,y\n");
-    scanf("%lf,%lf",&x,&y);
+
+    if(TEST_DATA == status){
+        if(x == -5)
+        {
+            printf("\n");
+        }
+        x = x + 0.5;  
+        if(x>=5)
+        {
+            y = y - 0.5;
+            x = -5;
+        }
+    }else{
+        printf("pls input test data x,y\n");
+        scanf("%lf,%lf",&x,&y);
+    }
     neural->layer->next_layer->node->next_node->out = x;
     neural->layer->next_layer->node->next_node->next_node->out = y;
     return 0;

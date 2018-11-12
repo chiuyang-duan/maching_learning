@@ -218,10 +218,12 @@ int neural_result_print(struct neural_context * temp_neural)
     obj_node = last_layer->node;
     while(NULL != obj_node->next_node){
         obj_node = obj_node->next_node;
-        printf("out%d:%lf ",count,obj_node->out);
+        if(count == 0)
+            printf("%.3lf ",obj_node->out);
+     //   printf("out%d:%lf ",count,obj_node->out);
         count++; 
     }
-    printf("\n");
+   // printf("\n");
     return 0;
 }
 

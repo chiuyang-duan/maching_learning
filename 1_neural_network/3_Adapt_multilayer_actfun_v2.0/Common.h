@@ -11,7 +11,7 @@
 
 
 
-#define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.001 
+
 #define INPUT_LAYER 0
 #define HIDDEN_ONE_LAYER 1
 #define INIT 0
@@ -20,14 +20,16 @@
 #define ADD_DELTA 3 
 #define GET_DELTA 4
 
-#define LEARNING_RATE 0.1
-#define LEARNING_NUM 2
+#define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.001 
+#define LEARNING_RATE 0.02
+#define LEARNING_NUM 2000
+
 #define DUMMY_NODE 1
 #define DUMMY -1.0
 
-#define DEBUG 1
+#define DEBUG 0
 #define DEBUG_POINT 0
-#define DEBUG_DATA 1
+#define DEBUG_DATA 0
 
 #if DEBUG
 #define LEARN_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
