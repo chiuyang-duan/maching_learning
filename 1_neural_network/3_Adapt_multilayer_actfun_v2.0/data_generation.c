@@ -36,19 +36,19 @@ int make_study_data1(struct neural_context * input_data)
     double data_out[2];
     LEARN_LOG("make_study_data1\n");
     printf("       y<x && y>0 && x<5.    \n"); 
-    data_x[0] = rand_num(10.0);
-    data_x[1] = rand_num(10.0);
+    data_x[0] = rand_num(5.0);
+    data_x[1] = rand_num(5.0);
     //DATA_LOG("data_x[0]=%lf, data_x[1]=%lf\n",data_x[0],data_x[1]);
-    
-    if((data_x[1] < data_x[0])&&(data_x[1] > 0)&&(data_x[0] < 5))
+    if((data_x[0] >= -2)&&(data_x[0] <= 2))
+    //if((data_x[1] <= data_x[0])&&(data_x[1] >= -2)&&(data_x[0] <= 3))
     {
-       data_out[0] = 0.9;
-       data_out[1] = 0.01;
+       data_out[0] = 1;
+       data_out[1] = 0;
     }
     else
     {
-        data_out[0] = 0.01;
-        data_out[1] = 0.9;
+        data_out[0] = 0;
+        data_out[1] = 1;
     }
     
     input_data->layer->next_layer->node->next_node->out = data_x[0];
@@ -136,25 +136,28 @@ struct neural_arg * set_input_data_arg()
     return obj;
 
 }
-double x = -5;
+double x = -5.5;
 double y = 5;
 int run_get_input_data(struct neural_context * neural,struct neural_context * data_list, int status)
 {
 
 
     if(TEST_DATA == status){
-        if(x == -5)
-        {
-            printf("\n");
-        }
+
         x = x + 0.5;  
         if(x>=5)
         {
             y = y - 0.5;
             x = -5;
+            
         }
+        if(x == -5)
+        {
+            printf("\n");
+        }        
+       // printf("%1.1lf,%1.1lf ",x,y);
     }else{
-        printf("pls input test data x,y\n");
+        printf("\n pls input test data x,y\n");
         scanf("%lf,%lf",&x,&y);
     }
     neural->layer->next_layer->node->next_node->out = x;

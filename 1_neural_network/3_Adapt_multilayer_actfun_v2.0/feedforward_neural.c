@@ -199,14 +199,14 @@ int main()
         LEARN_LOG("\n\nne->run(ne,NULL,ADD_DELTA);\n\n");
         ne->run(ne,NULL,ADD_DELTA);
     }
-
+#if PRINT_TEST_DATA
     for(i = 0;i < 400;i++){       
         input_data->run(input_data,NULL,TEST_DATA);
         ne->run(ne,input_data,FORECAST);
         ne->result_print(ne);
         //printf("%d ",i);
     }
-
+#endif
     while(1){
         input_data->run(input_data,NULL,GET_FORECAST_DATA);
         ne->run(ne,input_data,FORECAST);
