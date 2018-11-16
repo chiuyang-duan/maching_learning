@@ -20,18 +20,18 @@
 #define ADD_DELTA 3 
 #define GET_DELTA 4
 
-#define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.1 
-#define LEARNING_RATE 0.2
-#define LEARNING_NUM 2
+#define POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT 0.0001 
+#define LEARNING_RATE 0.005
+#define LEARNING_NUM 200000
 
 #define DUMMY_NODE 1
 #define DUMMY -1.0
 
-#define DEBUG 1
-#define DEBUG_POINT 1
-#define DEBUG_DATA 1
+#define DEBUG 0
+#define DEBUG_POINT 0
+#define DEBUG_DATA 0
 
-#define PRINT_TEST_DATA 0
+#define PRINT_TEST_DATA 1
 
 #if DEBUG
 #define LEARN_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
@@ -43,7 +43,7 @@
 #define LEARN_ERR(...)
 #endif
 #if DEBUG_POINT
-#define DEPOINT_LOG(...) printf("ERR_File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
+#define DEPOINT_LOG(...) printf("File %s, Func %s: %d > ", __FILE__, __FUNCTION__, __LINE__); \
                           printf(__VA_ARGS__);    
 #else
 #define DEPOINT_LOG(...)

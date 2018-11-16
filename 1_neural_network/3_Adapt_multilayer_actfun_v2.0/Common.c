@@ -223,6 +223,7 @@ int neural_result_print(struct neural_context * temp_neural)
      //   printf("out%d:%lf ",count,obj_node->out);
         count++; 
     }
+    
    // printf("\n");
     return 0;
 }

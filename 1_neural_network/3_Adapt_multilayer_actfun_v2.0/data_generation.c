@@ -35,7 +35,7 @@ int make_study_data1(struct neural_context * input_data)
     double data_x[2];
     double data_out[2];
     LEARN_LOG("make_study_data1\n");
-    printf("       y<x && y>0 && x<5.    \n"); 
+    LEARN_LOG("       y<x && y>0 && x<5.    \n"); 
     data_x[0] = rand_num(5.0);
     data_x[1] = rand_num(5.0);
     //DATA_LOG("data_x[0]=%lf, data_x[1]=%lf\n",data_x[0],data_x[1]);
@@ -154,7 +154,11 @@ int run_get_input_data(struct neural_context * neural,struct neural_context * da
         if(x == -5)
         {
             printf("\n");
-        }        
+        } 
+        if(x == 2)
+            printf("[2]");
+        if(x == -2)
+            printf("[-2]");
        // printf("%1.1lf,%1.1lf ",x,y);
     }else{
         printf("\n pls input test data x,y\n");

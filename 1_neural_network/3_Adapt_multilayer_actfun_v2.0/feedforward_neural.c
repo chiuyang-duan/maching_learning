@@ -86,8 +86,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                             if((PREV_NUM_NODE - 1) == k){
                                 LEARN_LOG("out %lf += -1 * weight[%d] %lf;\n",current_node->out,k,current_node->weight[k]);
                                 current_node->out += DUMMY * current_node->weight[k];
-                                LEARN_LOG("current_node->out = %lf\n",current_node->out);
-                                LEARN_LOG("--------------------------------------------------\n\n");
+                                LEARN_LOG("%d,%d current_node->out = %lf\n",i,j,current_node->out);
                             }
                             else{
                                 LEARN_LOG("out %lf += prev->out %lf * weight[%d] %lf;\n",current_node->out,temp_prev_layer_node->out,k,current_node->weight[k]);
@@ -118,7 +117,7 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         }
                         //e1 = e1 / 2.0;
                         e1 = e1 / ((double)(neural->arg->output_node));
-                        printf("E1 = %lf ,((double)(neural->arg->output_node))%d \n",e1,neural->arg->output_node);
+                        //printf("E1 = %lf ,((double)(neural->arg->output_node))%d \n",e1,neural->arg->output_node);
                         
                         temp_weight = current_node->weight[k];
                         current_node->weight[k] = current_node->weight[k] + POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
@@ -135,14 +134,16 @@ int neural_run(struct neural_context * neural,struct neural_context * data_list,
                         }
                         //e2 = e2 / 2.0;
                         e2 = e2 / ((double)(neural->arg->output_node));   
-                        printf("E2 = %lf \n",e2);
+                        //printf("E2 = %lf \n",e2);
                         
                         current_node->delta_weight[k] = LEARNING_RATE * (e1 - e2) / POSITIVE_PARTIAL_DERIVATIVES_COEFFICIENT;
                         current_node->weight[k] = temp_weight;
                     }
                 }
                 if(FORECAST == status){                   
-                    current_node->out = act_squashing_function(current_node->out);                                         
+                    current_node->out = act_squashing_function(current_node->out);  
+                    LEARN_LOG("%d,%d act_squ_fun(cur->out) = %lf\n",i,j,current_node->out);
+                    LEARN_LOG("--------------------------------------------------\n\n");
                 }                
             }
         }
@@ -198,6 +199,7 @@ int main()
         ne->run(ne,input_data,GET_DELTA);
         LEARN_LOG("\n\nne->run(ne,NULL,ADD_DELTA);\n\n");
         ne->run(ne,NULL,ADD_DELTA);
+        printf("%d / %d \n",i,LEARNING_NUM);
     }
 #if PRINT_TEST_DATA
     for(i = 0;i < 400;i++){       
