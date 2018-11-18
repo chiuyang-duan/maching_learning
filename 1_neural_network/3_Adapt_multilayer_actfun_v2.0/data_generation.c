@@ -39,8 +39,8 @@ int make_study_data1(struct neural_context * input_data)
     data_x[0] = rand_num(5.0);
     data_x[1] = rand_num(5.0);
     //DATA_LOG("data_x[0]=%lf, data_x[1]=%lf\n",data_x[0],data_x[1]);
-    if((data_x[0] >= -2)&&(data_x[0] <= 2))
-    //if((data_x[1] <= data_x[0])&&(data_x[1] >= -2)&&(data_x[0] <= 3))
+    //if((data_x[0] >= -2)&&(data_x[0] <= 2))
+    if((data_x[1] <= data_x[0])&&(data_x[1] >= -2)&&(data_x[0] <= 3))
     {
        data_out[0] = 1;
        data_out[1] = 0;
@@ -155,10 +155,10 @@ int run_get_input_data(struct neural_context * neural,struct neural_context * da
         {
             printf("\n");
         } 
-        if(x == 2)
-            printf("[2]");
-        if(x == -2)
-            printf("[-2]");
+       // if(x == 2)
+       //     printf("[2]");
+       // if(x == -2)
+       //     printf("[-2]");
        // printf("%1.1lf,%1.1lf ",x,y);
     }else{
         printf("\n pls input test data x,y\n");
