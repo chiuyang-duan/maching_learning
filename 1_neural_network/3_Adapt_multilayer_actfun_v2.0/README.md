@@ -7,3 +7,13 @@ gradient = (f(x+delta_x)-f(x))/delta_x      delta_x --> 0 <br>
 
 # architecture #
 ![architecture](https://github.com/depthyang/maching_learning/raw/master/Picture/BP_multi-layer_feedforward_neural.png)
+
+使用方法<br>
+  先编译 <br>  make all<br>
+  然后执行<br> ./myneural<br>
+  如果没有好的选择，可以参考下边的参数<br>
+pls input number of input_node:2<br>
+pls input number of output_node:2<br>
+pls input number of hidden layer:2<br>
+pls input 2_layer_node_num:3<br>
+pls input 3_layer_node_num:3<br>
