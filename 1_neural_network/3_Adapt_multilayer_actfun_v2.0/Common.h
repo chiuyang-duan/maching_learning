@@ -95,6 +95,6 @@ struct neural_layer * get_last_layer(struct neural_context * );
 double act_squashing_function(double );
 double rand_num(double max);
 double act_squashing_function(double x);
-
+void rand_init();
 
 #endif
